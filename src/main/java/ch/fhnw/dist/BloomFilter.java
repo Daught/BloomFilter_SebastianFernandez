@@ -13,7 +13,7 @@ public class BloomFilter implements iFilter{
     private int numberOfFilterElements; // number of filter values.
     private double probabilityFalsePositive; // probability of false-positives
 
-    public int[] bloomHashingArray;
+    private int[] bloomHashingArray;
 
     public BloomFilter(int numberOfFilterElements, double probabilityFalsePositive){
         this.probabilityFalsePositive = probabilityFalsePositive;
@@ -25,18 +25,18 @@ public class BloomFilter implements iFilter{
         Arrays.stream(this.bloomHashingArray).forEach(m -> m = 0);
     }
 
-    public int getSizeOfHashingArray(){
+    protected int getSizeOfHashingArray(){
         return this.sizeOfHashingArray;
     }
 
-    public int getNumberOfHashFunctions(){
+    protected int getNumberOfHashFunctions(){
         return this.numberOfHashFunctions;
     }
 
     /**
      * method to add a value to datastructure.
      *
-     * @param value
+     * @param value, to be added to the Array.
      */
     @Override
     public void add(String value) {
@@ -48,7 +48,7 @@ public class BloomFilter implements iFilter{
     /**
      * method to check whether datastructure has value.
      *
-     * @param value
+     * @param value, to be check if probably exists in Array.
      * @return boolean
      */
     @Override
@@ -62,10 +62,22 @@ public class BloomFilter implements iFilter{
         return true;
     }
 
+    /**
+     * method to calculate the position of the element in Array by given Hash Function.
+     *
+     * @param hashFunction, the murmur3_128 Bit Hash function.
+     * @param value, value that shall be hashed by the given function.
+     * @return int, position in the BloomFilter - Array, calculated with modulo based on the size of the array.
+     */
     private int getPositionFromHashedValueInFilterArray(String value, HashFunction hashFunction){
         return Math.abs(hashFunction.hashString(value, Charset.defaultCharset()).asInt()) % this.sizeOfHashingArray;
     }
 
+    /**
+     * method to create Hashing Array of Murmur3_128 Functions
+     *
+     * @return HashFunction Array, generated with different seeds.
+     */
     private HashFunction[] CreateMurmurHashArray(){
         var murmur128HashFunctions = new HashFunction[this.numberOfHashFunctions];
         for(var seed=0; seed<this.numberOfHashFunctions; seed++)
